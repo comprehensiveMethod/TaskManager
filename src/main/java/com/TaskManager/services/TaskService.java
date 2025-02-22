@@ -22,6 +22,9 @@ public class TaskService {
         task.setPriority(taskDetails.getPriority());
         return taskRepository.save(task);
     }
+    public Task getTaskById(Long id){
+        return taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
+    }
 
     public void deleteTask(Long id) {
         taskRepository.deleteById(id);
