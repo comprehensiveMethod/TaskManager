@@ -4,12 +4,16 @@ import com.TaskManager.dtos.RegistrationUserDto;
 import com.TaskManager.models.User;
 import com.TaskManager.repositories.RoleRepository;
 import com.TaskManager.repositories.UserRepository;
+import com.TaskManager.security.PasswordConfig;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +45,8 @@ public class UserService implements UserDetailsService {
         User user = new User();
         user.setEmail(registrationUserDto.getEmail());
         user.setPassword(passwordEncoder.encode(registrationUserDto.getPassword()));
-        user.setRoles(List.of(roleRepository.findByName("ROLE_USER").get()));
+
+        user.setRoles(List.of(roleRepository.findByName("USER").get()));
 
         return userRepository.save(user);
     }
