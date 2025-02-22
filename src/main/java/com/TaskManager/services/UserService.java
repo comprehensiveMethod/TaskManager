@@ -1,5 +1,6 @@
 package com.TaskManager.services;
 
+import com.TaskManager.dtos.RegistrationUserDto;
 import com.TaskManager.models.User;
 import com.TaskManager.repositories.RoleRepository;
 import com.TaskManager.repositories.UserRepository;
@@ -9,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.Optional;
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
     public Optional<User> findByUsername(String email){
         return userRepository.findByEmail(email);
     }
@@ -34,8 +37,12 @@ public class UserService implements UserDetailsService {
                 user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList()
         );
     }
-    public void createNewUser(User user){
+    public User createNewUser(RegistrationUserDto registrationUserDto){
+        User user = new User();
+        user.setEmail(registrationUserDto.getEmail());
+        user.setPassword(passwordEncoder.encode(registrationUserDto.getPassword()));
         user.setRoles(List.of(roleRepository.findByName("ROLE_USER").get()));
-        userRepository.save(user);
+
+        return userRepository.save(user);
     }
 }
