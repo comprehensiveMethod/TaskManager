@@ -54,7 +54,9 @@ public class TaskServiceTests {
         Task task = new Task();
         task.setId(1L);
         task.setTitle("Test Task");
-
+        task.setDescription("Test Description");
+        task.setStatus(TaskStatus.IN_PROGRESS);
+        task.setPriority(TaskPriority.HIGH);
         when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
 
 
