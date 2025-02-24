@@ -3,6 +3,12 @@ package com.TaskManager.controllers;
 import com.TaskManager.dtos.TaskRequestDto;
 import com.TaskManager.dtos.TaskResponseDto;
 import com.TaskManager.services.TaskService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,17 +22,27 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
+@Tag(name = "Task API", description = "Управление задачами")
 public class TaskController {
     private final TaskService taskService;
     @GetMapping("/{id}")
-    public ResponseEntity<TaskResponseDto> getTaskById(@PathVariable Long id){
+    @Operation(summary = "Получить задачу по ID", description = "Возвращает задачу по её идентификатору")
+    @ApiResponse(responseCode = "200", description = "Задача найдена")
+    @ApiResponse(responseCode = "404", description = "Задача не найдена",content = @Content())
+    @ApiResponse(responseCode = "403", description = "Доступ запрещен",content = @Content())
+    public ResponseEntity<TaskResponseDto> getTaskById(@Parameter(description = "ID задачи", required = true) @PathVariable Long id){
         try {
             return ResponseEntity.ok(taskService.getTaskById(id));
         }catch (NullPointerException e){
             return ResponseEntity.notFound().build();
         }
     }
+
     @GetMapping
+    @Operation(summary = "Получить все задачи", description = "Возвращает все задачи(включена фильтрация и пагинация)")
+    @ApiResponse(responseCode = "200", description = "Задачи найдены")
+    @ApiResponse(responseCode = "404", description = "Задачи не найдены",content = @Content())
+    @ApiResponse(responseCode = "403", description = "Доступ запрещен",content = @Content())
     public ResponseEntity<Page<TaskResponseDto>> getAllTasks(@RequestParam(defaultValue = "0") int page,
                                                              @RequestParam(defaultValue = "10") int size,
                                                              @RequestParam(required = false) String status,
@@ -35,7 +51,12 @@ public class TaskController {
     }
 
     @GetMapping("/author/{email}")
-    public ResponseEntity<List<TaskResponseDto>> getTasksByAuthor(@PathVariable String email){
+    @Operation(summary = "Получить задачи автора(по его email'у)", description = "Возвращает все задачи автора")
+    @ApiResponse(responseCode = "200", description = "Задачи найдена")
+    @ApiResponse(responseCode = "404", description = "Задачи не найдена",content = @Content())
+    @ApiResponse(responseCode = "403", description = "Доступ запрещен",content = @Content())
+    public ResponseEntity<List<TaskResponseDto>> getTasksByAuthor(@Parameter(description = "Email автора", required = true)
+                                                                      @PathVariable String email){
         try {
             return ResponseEntity.ok(taskService.getTasksByAuthor(email));
         }catch (NullPointerException e){
@@ -43,7 +64,12 @@ public class TaskController {
         }
     }
     @GetMapping("/assignee/{email}")
-    public ResponseEntity<List<TaskResponseDto>> getTasksByAssignee(@PathVariable String email){
+    @Operation(summary = "Получить задачи исполнителя(по его email'у)", description = "Возвращает все задачи исполнителя")
+    @ApiResponse(responseCode = "200", description = "Задачи найдена")
+    @ApiResponse(responseCode = "404", description = "Задачи не найдены",content = @Content())
+    @ApiResponse(responseCode = "403", description = "Доступ запрещен",content = @Content())
+    public ResponseEntity<List<TaskResponseDto>> getTasksByAssignee(@Parameter(description = "Email исполнителя", required = true)
+                                                                        @PathVariable String email){
         try {
             return ResponseEntity.ok(taskService.getTasksByAssignee(email));
         }catch (NullPointerException e){
@@ -52,7 +78,15 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskResponseDto> createTask(@RequestBody TaskRequestDto taskRequestDto) {
+    @Operation(summary = "Создать задачу", description = "Создает задачу ")
+    @ApiResponse(responseCode = "200", description = "Задачи найдена")
+    @ApiResponse(responseCode = "404", description = "Задачи не найдены",content = @Content())
+    @ApiResponse(responseCode = "403", description = "Доступ запрещен" ,content = @Content())
+    public ResponseEntity<TaskResponseDto> createTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Данные для создания задачи",
+            required = true,
+            content = @Content(schema = @Schema(implementation = TaskRequestDto.class)))
+                                                          @RequestBody TaskRequestDto taskRequestDto) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(taskRequestDto));
         }catch (NullPointerException e){

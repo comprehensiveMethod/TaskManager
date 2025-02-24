@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class PasswordConfig {
+    //бинится здесь, а не в SeciurityConfig из-за того, что входит в цикл с UserService
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
