@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class TaskController {
     private final TaskService taskService;
-    @PreAuthorize("hasRole('ADMIN') or @taskService.isTaskOwner(#id, authentication.principal)")
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponseDto> getTaskById(@PathVariable Long id){
         try {
