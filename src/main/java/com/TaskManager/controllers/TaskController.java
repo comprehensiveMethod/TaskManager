@@ -2,13 +2,16 @@ package com.TaskManager.controllers;
 
 import com.TaskManager.dtos.TaskRequestDto;
 import com.TaskManager.dtos.TaskResponseDto;
-import com.TaskManager.models.Task;
 import com.TaskManager.services.TaskService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -19,6 +22,30 @@ public class TaskController {
     public ResponseEntity<TaskResponseDto> getTaskById(@PathVariable Long id){
         try {
             return ResponseEntity.ok(taskService.getTaskById(id));
+        }catch (NullPointerException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping
+    public ResponseEntity<Page<TaskResponseDto>> getAllTasks(@RequestParam(defaultValue = "0") int page,
+                                                             @RequestParam(defaultValue = "10") int size,
+                                                             @RequestParam(required = false) String status,
+                                                             @RequestParam(required = false) String priority){
+        return ResponseEntity.ok(taskService.getAllTasks(PageRequest.of(page,size),status,priority));
+    }
+
+    @GetMapping("/author/{email}")
+    public ResponseEntity<List<TaskResponseDto>> getTasksByAuthor(@PathVariable String email){
+        try {
+            return ResponseEntity.ok(taskService.getTasksByAuthor(email));
+        }catch (NullPointerException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/assignee/{email}")
+    public ResponseEntity<List<TaskResponseDto>> getTasksByAssignee(@PathVariable String email){
+        try {
+            return ResponseEntity.ok(taskService.getTasksByAssignee(email));
         }catch (NullPointerException e){
             return ResponseEntity.notFound().build();
         }

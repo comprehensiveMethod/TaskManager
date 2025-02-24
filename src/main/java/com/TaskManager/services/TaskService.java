@@ -3,10 +3,18 @@ package com.TaskManager.services;
 import com.TaskManager.dtos.TaskRequestDto;
 import com.TaskManager.dtos.TaskResponseDto;
 import com.TaskManager.models.Task;
+import com.TaskManager.models.User;
 import com.TaskManager.repositories.TaskRepository;
 import com.TaskManager.repositories.UserRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,15 +30,7 @@ public class TaskService {
         task.setPriority(taskRequestDto.getPriority());
         task.setTitle(taskRequestDto.getTitle());
         Task savedTask = taskRepository.save(task);
-        return new TaskResponseDto(
-                savedTask.getId(),
-                savedTask.getTitle(),
-                savedTask.getDescription(),
-                savedTask.getStatus(),
-                savedTask.getPriority(),
-                savedTask.getAuthor().getEmail(),
-                savedTask.getAssignee().getEmail()
-        );
+        return toDto(savedTask);
     }
 
     public TaskResponseDto updateTask(Long id, TaskRequestDto taskDetails) {
@@ -42,18 +42,34 @@ public class TaskService {
         task.setAssignee(userRepository.findByEmail(taskDetails.getAssignee_email()).orElseThrow(() -> new NullPointerException("Assignee not found")));
         task.setAuthor(userRepository.findByEmail(taskDetails.getAuthor_email()).orElseThrow(() -> new NullPointerException("Author not found")));
         Task savedTask = taskRepository.save(task);
-        return new TaskResponseDto(
-                savedTask.getId(),
-                savedTask.getTitle(),
-                savedTask.getDescription(),
-                savedTask.getStatus(),
-                savedTask.getPriority(),
-                savedTask.getAuthor().getEmail(),
-                savedTask.getAssignee().getEmail()
-        );
+        return toDto(savedTask);
     }
     public TaskResponseDto getTaskById(Long id){
         Task task = taskRepository.findById(id).orElseThrow(() -> new NullPointerException("Task not found"));
+        return toDto(task);
+    }
+    public List<TaskResponseDto> getTasksByAuthor(String email){
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("User not found"));
+        List<Task> tasks = taskRepository.findByAuthor(user);
+        return tasks.stream().map(this::toDto).toList();
+    }
+
+    public List<TaskResponseDto> getTasksByAssignee(String email){
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("User not found"));
+        List<Task> tasks = taskRepository.findByAssignee(user);
+
+        return tasks.stream().map(this::toDto).toList();
+    }
+
+    public void deleteTask(Long id) {
+        taskRepository.deleteById(id);
+    }
+
+    public boolean isTaskOwner(Long taskId, String email) {
+        return taskRepository.findById(taskId).get().getAuthor().getEmail().equals(email);
+    }
+
+    private TaskResponseDto toDto(Task task) {
         return new TaskResponseDto(
                 task.getId(),
                 task.getTitle(),
@@ -64,12 +80,18 @@ public class TaskService {
                 task.getAssignee().getEmail()
         );
     }
-
-    public void deleteTask(Long id) {
-        taskRepository.deleteById(id);
-    }
-
-    public boolean isTaskOwner(Long taskId, String email) {
-        return taskRepository.findById(taskId).get().getAuthor().getEmail().equals(email);
+    public Page<TaskResponseDto> getAllTasks(Pageable pageable, String status, String priority) {
+            Specification<Task> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+            if (priority != null) {
+                predicates.add(cb.equal(root.get("priority"), priority));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+        Page<Task> tasks = taskRepository.findAll(spec, pageable);
+        return tasks.map(this::toDto);
     }
 }

@@ -7,7 +7,6 @@ import com.TaskManager.repositories.CommentRepository;
 import com.TaskManager.repositories.TaskRepository;
 import com.TaskManager.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import com.TaskManager.models.Comment;
 
