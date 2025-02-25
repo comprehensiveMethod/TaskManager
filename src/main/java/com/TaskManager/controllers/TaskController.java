@@ -2,6 +2,7 @@ package com.TaskManager.controllers;
 
 import com.TaskManager.dtos.TaskRequestDto;
 import com.TaskManager.dtos.TaskResponseDto;
+import com.TaskManager.models.TaskStatus;
 import com.TaskManager.services.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -64,7 +65,7 @@ public class TaskController {
         }
     }
     @GetMapping("/assignee/{email}")
-    @Operation(summary = "Получить задачи исполнителя(по его email'у)", description = "Возвращает все задачи исполнителя")
+    @Operation(summary = "Получить задачи исполнителя", description = "Возвращает все задачи исполнителя(по его email'у)")
     @ApiResponse(responseCode = "200", description = "Задачи найдена")
     @ApiResponse(responseCode = "404", description = "Задачи не найдены",content = @Content())
     @ApiResponse(responseCode = "403", description = "Доступ запрещен",content = @Content())
@@ -92,11 +93,14 @@ public class TaskController {
         }catch (NullPointerException e){
             return ResponseEntity.notFound().build();
         }
-
     }
 
-    @PreAuthorize("hasRole('ADMIN') or @taskService.isTaskOwner(#id, authentication.principal)")
-    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/admin/{id}")
+    @Operation(summary = "Редактировать задачу", description = "Админ запрос. Позволяет полностью менять содержимое задачи")
+    @ApiResponse(responseCode = "200", description = "Задачи изменена")
+    @ApiResponse(responseCode = "404", description = "Задача/автор/исполнитель не найдены",content = @Content())
+    @ApiResponse(responseCode = "403", description = "Доступ запрещен" ,content = @Content())
     public ResponseEntity<TaskResponseDto> updateTask(@PathVariable Long id, @RequestBody TaskRequestDto taskRequestDto) {
         try {
             return ResponseEntity.ok(taskService.updateTask(id, taskRequestDto));
@@ -104,8 +108,25 @@ public class TaskController {
             return ResponseEntity.notFound().build();
         }
     }
-    @PreAuthorize("hasRole('ADMIN') or @taskService.isTaskOwner(#id, authentication.principal)")
-    @DeleteMapping("/{id}")
+    @PreAuthorize("@taskService.isTaskAssignee(#id, authentication.principal)")
+    @PutMapping("/{id}")
+    @Operation(summary = "Редактировать задачу", description = "Позволяет менять статус задачи")
+    @ApiResponse(responseCode = "200", description = "Задачи изменена")
+    @ApiResponse(responseCode = "404", description = "Задача/автор/исполнитель не найдены",content = @Content())
+    @ApiResponse(responseCode = "403", description = "Доступ запрещен" ,content = @Content())
+    public ResponseEntity<TaskResponseDto> updateTask(@PathVariable Long id, @RequestBody TaskStatus taskStatus){
+        try {
+            return ResponseEntity.ok(taskService.updateTask(id, taskStatus));
+        }catch (NullPointerException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/admin/{id}")
+    @Operation(summary = "Удалить задачу", description = "Админ запрос. Позволяет полностью удалить содержимое задачи")
+    @ApiResponse(responseCode = "200", description = "Задача удалена")
+    @ApiResponse(responseCode = "404", description = "Задача не найдена",content = @Content())
+    @ApiResponse(responseCode = "403", description = "Доступ запрещен" ,content = @Content())
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         try {
             taskService.deleteTask(id);

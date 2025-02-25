@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class CommentResponseDto {
+    //TODO описать для API
     private Long id;
 
     private String text;

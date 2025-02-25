@@ -3,6 +3,7 @@ package com.TaskManager.services;
 import com.TaskManager.dtos.TaskRequestDto;
 import com.TaskManager.dtos.TaskResponseDto;
 import com.TaskManager.models.Task;
+import com.TaskManager.models.TaskStatus;
 import com.TaskManager.models.User;
 import com.TaskManager.repositories.TaskRepository;
 import com.TaskManager.repositories.UserRepository;
@@ -44,6 +45,14 @@ public class TaskService {
         Task savedTask = taskRepository.save(task);
         return toDto(savedTask);
     }
+    public TaskResponseDto updateTask(Long id, TaskStatus taskStatus){
+        Task task = taskRepository.findById(id).orElseThrow(() -> new NullPointerException("Task not found"));
+        task.setStatus(taskStatus);
+        Task savedTask = taskRepository.save(task);
+        return toDto(savedTask);
+    }
+
+
     public TaskResponseDto getTaskById(Long id){
         Task task = taskRepository.findById(id).orElseThrow(() -> new NullPointerException("Task not found"));
         return toDto(task);
@@ -65,8 +74,8 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
-    public boolean isTaskOwner(Long taskId, String email) {
-        return taskRepository.findById(taskId).get().getAuthor().getEmail().equals(email);
+    public boolean isTaskAssignee(Long taskId, String email) {
+        return taskRepository.findById(taskId).get().getAssignee().getEmail().equals(email);
     }
 
     private TaskResponseDto toDto(Task task) {

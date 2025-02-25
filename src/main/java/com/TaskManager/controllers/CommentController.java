@@ -30,7 +30,7 @@ public class CommentController {
             return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping("/ByAuthor/{email}")
+    @GetMapping("/byAuthor/{email}")
     public ResponseEntity<List<CommentResponseDto>> getCommentsByAuthor(@PathVariable String email){
         try{
             return ResponseEntity.ok(commentService.getCommentsByAuthor(email));
@@ -38,7 +38,7 @@ public class CommentController {
             return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping("/ByTask/{id}")
+    @GetMapping("/byTask/{id}")
     public ResponseEntity<List<CommentResponseDto>> getCommentsByTask(@PathVariable Long id){
         try{
             return ResponseEntity.ok(commentService.getCommentsByTaskId(id));
@@ -46,4 +46,5 @@ public class CommentController {
             return ResponseEntity.notFound().build();
         }
     }
+
 }

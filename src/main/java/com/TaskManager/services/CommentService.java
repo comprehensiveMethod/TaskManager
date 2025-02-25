@@ -2,6 +2,7 @@ package com.TaskManager.services;
 
 import com.TaskManager.dtos.CommentRequestDto;
 import com.TaskManager.dtos.CommentResponseDto;
+import com.TaskManager.dtos.TaskResponseDto;
 import com.TaskManager.models.User;
 import com.TaskManager.repositories.CommentRepository;
 import com.TaskManager.repositories.TaskRepository;
@@ -30,54 +31,34 @@ public class CommentService {
         )));
         comment.setText(commentRequestDto.getText());
         Comment saved_comment = commentRepository.save(comment);
-        return new CommentResponseDto(
-                saved_comment.getId(),
-                saved_comment.getText(),
-                saved_comment.getTask().getId(),
-                saved_comment.getAuthor().getEmail()
-        );
+        return toDto(saved_comment);
     }
     public CommentResponseDto getCommentById(Long id) {
         Comment saved_comment = commentRepository.findById(id).orElseThrow(() -> new NullPointerException(
                 "Comment not found"
         ));
-        return new CommentResponseDto(
-                saved_comment.getId(),
-                saved_comment.getText(),
-                saved_comment.getTask().getId(),
-                saved_comment.getAuthor().getEmail()
-        );
+        return toDto(saved_comment);
     }
 
     public List<CommentResponseDto> getCommentsByTaskId(Long taskId) {
         List<Comment> comments = commentRepository.findByTaskId(taskId);
         List<CommentResponseDto> response = new ArrayList<>();
-        for (Comment e:comments){
-            CommentResponseDto responseComment = new CommentResponseDto(
-                    e.getId(),
-                    e.getText(),
-                    e.getTask().getId(),
-                    e.getAuthor().getEmail()
-            );
-            response.add(responseComment);
-        }
-        return response;
+        return comments.stream().map(this::toDto).toList();
     }
     public List<CommentResponseDto> getCommentsByAuthor(String email){
         User user = userRepository.findByEmail(email).orElseThrow(() -> new NullPointerException(
                 "Email not found"
         ));
         List<Comment> comments = commentRepository.findByAuthorId(user.getId());
-        List<CommentResponseDto> response = new ArrayList<>();
-        for (Comment e:comments){
-            CommentResponseDto responseComment = new CommentResponseDto(
-                    e.getId(),
-                    e.getText(),
-                    e.getTask().getId(),
-                    e.getAuthor().getEmail()
-            );
-            response.add(responseComment);
-        }
-        return response;
+        return comments.stream().map(this::toDto).toList();
+    }
+    public CommentResponseDto toDto(Comment comment){
+        return new CommentResponseDto(
+                comment.getId(),
+                comment.getText(),
+                comment.getTask().getId(),
+                comment.getAuthor().getEmail()
+
+        );
     }
 }
