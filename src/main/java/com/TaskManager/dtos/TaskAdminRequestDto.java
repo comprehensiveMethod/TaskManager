@@ -1,16 +1,12 @@
 package com.TaskManager.dtos;
 
-
 import com.TaskManager.models.TaskPriority;
 import com.TaskManager.models.TaskStatus;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-
 @Data
-public class TaskRequestDto {
-
+public class TaskAdminRequestDto {
     @Schema(
             description = "Название задачи",
             example = "Рефакторинг кода"
@@ -36,9 +32,14 @@ public class TaskRequestDto {
     private TaskPriority priority;
 
     @Schema(
+            description = "Email автора задачи",
+            example = "exampleAuthor@mail.ru"
+    )
+    private String author_email;
+
+    @Schema(
             description = "Email исполнителя задачи",
             example = "exampleAssignee@mail.ru"
     )
     private String assignee_email;
-
 }

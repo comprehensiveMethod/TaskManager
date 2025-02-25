@@ -1,5 +1,6 @@
 package com.TaskManager.services;
 
+import com.TaskManager.dtos.TaskAdminRequestDto;
 import com.TaskManager.dtos.TaskRequestDto;
 import com.TaskManager.dtos.TaskResponseDto;
 import com.TaskManager.models.Task;
@@ -22,10 +23,10 @@ import java.util.List;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
-    public TaskResponseDto createTask(TaskRequestDto taskRequestDto) {
+    public TaskResponseDto createTask(TaskRequestDto taskRequestDto, String requester_email) {
         Task task = new Task();
         task.setAssignee(userRepository.findByEmail(taskRequestDto.getAssignee_email()).orElseThrow(() -> new NullPointerException("Assignee not found")));
-        task.setAuthor(userRepository.findByEmail(taskRequestDto.getAuthor_email()).orElseThrow(() -> new NullPointerException("Author not found")));
+        task.setAuthor(userRepository.findByEmail(requester_email).orElseThrow(() -> new NullPointerException("Author not found")));
         task.setDescription(taskRequestDto.getDescription());
         task.setStatus(taskRequestDto.getStatus());
         task.setPriority(taskRequestDto.getPriority());
@@ -34,7 +35,7 @@ public class TaskService {
         return toDto(savedTask);
     }
 
-    public TaskResponseDto updateTask(Long id, TaskRequestDto taskDetails) {
+    public TaskResponseDto updateTask(Long id, TaskAdminRequestDto taskDetails) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new NullPointerException("Task not found"));
         task.setTitle(taskDetails.getTitle());
         task.setDescription(taskDetails.getDescription());
