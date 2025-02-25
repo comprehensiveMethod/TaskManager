@@ -1,5 +1,6 @@
 package com.TaskManager.controllers;
 
+import com.TaskManager.dtos.TaskAdminRequestDto;
 import com.TaskManager.dtos.TaskRequestDto;
 import com.TaskManager.dtos.TaskResponseDto;
 import com.TaskManager.models.TaskStatus;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -89,7 +92,9 @@ public class TaskController {
             content = @Content(schema = @Schema(implementation = TaskRequestDto.class)))
                                                           @RequestBody TaskRequestDto taskRequestDto) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(taskRequestDto));
+            Authentication authorization = SecurityContextHolder.getContext().getAuthentication();
+            String requester_email = authorization.getPrincipal().toString();
+            return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(taskRequestDto,requester_email));
         }catch (NullPointerException e){
             return ResponseEntity.notFound().build();
         }
@@ -101,7 +106,7 @@ public class TaskController {
     @ApiResponse(responseCode = "200", description = "Задачи изменена")
     @ApiResponse(responseCode = "404", description = "Задача/автор/исполнитель не найдены",content = @Content())
     @ApiResponse(responseCode = "403", description = "Доступ запрещен" ,content = @Content())
-    public ResponseEntity<TaskResponseDto> updateTask(@PathVariable Long id, @RequestBody TaskRequestDto taskRequestDto) {
+    public ResponseEntity<TaskResponseDto> updateTask(@PathVariable Long id, @RequestBody TaskAdminRequestDto taskRequestDto) {
         try {
             return ResponseEntity.ok(taskService.updateTask(id, taskRequestDto));
         }catch (NullPointerException e){

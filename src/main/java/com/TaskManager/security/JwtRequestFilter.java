@@ -31,6 +31,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             jwt = authHeader.substring(7);
             try {
                 email = jwtUtil.getUsername(jwt);
+                if(email == null){
+                    return;
+                }
             }catch (ExpiredJwtException e){
                 log.debug("Token expired");
             }
