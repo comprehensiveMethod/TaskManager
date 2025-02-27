@@ -100,13 +100,17 @@ public class TaskController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+
     @PutMapping("/admin/{id}")
     @Operation(summary = "Редактировать задачу", description = "Админ запрос. Позволяет полностью менять содержимое задачи")
     @ApiResponse(responseCode = "200", description = "Задачи изменена")
     @ApiResponse(responseCode = "404", description = "Задача/автор/исполнитель не найдены",content = @Content())
     @ApiResponse(responseCode = "403", description = "Доступ запрещен" ,content = @Content())
     public ResponseEntity<TaskResponseDto> updateTask(@PathVariable Long id, @RequestBody TaskAdminRequestDto taskRequestDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ADMIN"))){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             return ResponseEntity.ok(taskService.updateTask(id, taskRequestDto));
         }catch (NullPointerException e){
@@ -126,13 +130,17 @@ public class TaskController {
             return ResponseEntity.notFound().build();
         }
     }
-    @PreAuthorize("hasRole('ADMIN')")
+
     @DeleteMapping("/admin/{id}")
-    @Operation(summary = "Удалить задачу", description = "Админ запрос. Позволяет полностью удалить содержимое задачи")
+    @Operation(summary = "Удалить задачу", description = "Админ запрос. Позволяет полностью удалить задачу")
     @ApiResponse(responseCode = "200", description = "Задача удалена")
     @ApiResponse(responseCode = "404", description = "Задача не найдена",content = @Content())
     @ApiResponse(responseCode = "403", description = "Доступ запрещен" ,content = @Content())
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ADMIN"))){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             taskService.deleteTask(id);
             return ResponseEntity.noContent().build();

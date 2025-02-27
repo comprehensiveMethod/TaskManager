@@ -39,6 +39,6 @@ public class TaskRequestDto {
             description = "Email исполнителя задачи",
             example = "exampleAssignee@mail.ru"
     )
-    private String assignee_email;
+    private String assigneeEmail;
 
 }

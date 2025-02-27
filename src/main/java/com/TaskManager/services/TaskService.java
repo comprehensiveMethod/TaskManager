@@ -25,7 +25,7 @@ public class TaskService {
     private final UserRepository userRepository;
     public TaskResponseDto createTask(TaskRequestDto taskRequestDto, String requester_email) {
         Task task = new Task();
-        task.setAssignee(userRepository.findByEmail(taskRequestDto.getAssignee_email()).orElseThrow(() -> new NullPointerException("Assignee not found")));
+        task.setAssignee(userRepository.findByEmail(taskRequestDto.getAssigneeEmail()).orElseThrow(() -> new NullPointerException("Assignee not found")));
         task.setAuthor(userRepository.findByEmail(requester_email).orElseThrow(() -> new NullPointerException("Author not found")));
         task.setDescription(taskRequestDto.getDescription());
         task.setStatus(taskRequestDto.getStatus());
@@ -41,8 +41,8 @@ public class TaskService {
         task.setDescription(taskDetails.getDescription());
         task.setStatus(taskDetails.getStatus());
         task.setPriority(taskDetails.getPriority());
-        task.setAssignee(userRepository.findByEmail(taskDetails.getAssignee_email()).orElseThrow(() -> new NullPointerException("Assignee not found")));
-        task.setAuthor(userRepository.findByEmail(taskDetails.getAuthor_email()).orElseThrow(() -> new NullPointerException("Author not found")));
+        task.setAssignee(userRepository.findByEmail(taskDetails.getAssigneeEmail()).orElseThrow(() -> new NullPointerException("Assignee not found")));
+        task.setAuthor(userRepository.findByEmail(taskDetails.getAuthorEmail()).orElseThrow(() -> new NullPointerException("Author not found")));
         Task savedTask = taskRepository.save(task);
         return toDto(savedTask);
     }

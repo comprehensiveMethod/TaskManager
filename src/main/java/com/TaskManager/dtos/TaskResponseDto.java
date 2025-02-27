@@ -43,12 +43,12 @@ public class TaskResponseDto {
             description = "Email автора задачи",
             example = "exampleAuthor@mail.ru"
     )
-    private String author_email;
+    private String authorEmail;
 
     @Schema(
             description = "Email исполнителя задачи",
             example = "exampleAssignee@mail.ru"
     )
-    private String assignee_email;
+    private String assigneeEmail;
 
 }

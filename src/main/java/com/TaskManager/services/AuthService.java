@@ -48,4 +48,7 @@ public class AuthService {
         User user = userService.createNewUser(registrationUserDto);
         return ResponseEntity.ok(user);
     }
+    public boolean isUserAdmin(){
+        return true;
+    }
 }
