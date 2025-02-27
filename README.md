@@ -11,6 +11,6 @@
 2. Вы получите токен
 3. Токен надо скопировать и добавить Header к вашему запросу в API![image](https://github.com/user-attachments/assets/27d33d96-cd33-4c09-84e3-62bcb0e54a40)
 4. Чтобы зайти под админом, советую просто в pgAdmin поменять id роли в таблице user_roles на id роли "ADMIN" (порт стандартный - 5050, PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: root
+      PGADMIN_DEFAULT_PASSWORD: root, добавить сервер connection: service-db, user: postgres, password: postgres)
 ---
 ## Надеюсь сильно не косячил и вам понравится :) 
