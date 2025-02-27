@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.security.SignatureException;
 
 @Component
 @RequiredArgsConstructor
@@ -32,6 +31,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             jwt = authHeader.substring(7);
             try {
                 email = jwtUtil.getUsername(jwt);
+                if(email == null){
+                    return;
+                }
             }catch (ExpiredJwtException e){
                 log.debug("Token expired");
             }

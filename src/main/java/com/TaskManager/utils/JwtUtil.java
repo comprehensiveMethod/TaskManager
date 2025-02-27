@@ -3,8 +3,8 @@ package com.TaskManager.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -19,6 +19,7 @@ import java.util.Map;
 
 @Component
 public class JwtUtil {
+    //конечно надо хранить в application.properties ключ в ком. разработке, для наглядности поставил тут
     private static final String SECRET_KEY = "very_secret_key_which_should_be_very_long";
     SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     public String generateToken(UserDetails userDetails){
@@ -35,19 +36,34 @@ public class JwtUtil {
                 .compact();
     }
     public String getUsername(String token){
-        return getAllClaimsFromToken(token).getSubject();
+        try {
+            return getAllClaimsFromToken(token).getSubject();
+        }catch (NullPointerException ex){
+            return null;
+        }
+
     }
     public List<String> getRoles(String token){
-        return getAllClaimsFromToken(token).get("roles", List.class);
+        try {
+            return getAllClaimsFromToken(token).get("roles", List.class);
+        }catch (NullPointerException ex){
+            return null;
+        }
     }
 
     private Claims getAllClaimsFromToken(String token){
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            return Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        }catch (SignatureException e){
+            System.err.println("Invalid JWT signature. " + e.getMessage());
+            return null;
+        }
     }
+
 
 }
 
