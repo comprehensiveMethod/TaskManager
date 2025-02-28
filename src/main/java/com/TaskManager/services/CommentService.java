@@ -25,7 +25,12 @@ public class CommentService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final TaskService taskService;
-    //создаем коммент
+    /**
+     * Создает комментарий и кладёт его в базу данных
+     * @param commentRequestDto Dto содержащая данные о комментарии
+     * @param requester_email почта отправителя запроса
+     * @return {@code CommentResponseDto} содержащую данные о сохраненном комментарии
+     */
     public CommentResponseDto createComment(CommentRequestDto commentRequestDto,String requester_email) {
         Task task = taskRepository.findById(commentRequestDto.getTaskId()).orElseThrow(() -> new NullPointerException(
                 "Task not found"
@@ -44,14 +49,24 @@ public class CommentService {
         Comment saved_comment = commentRepository.save(comment);
         return toDto(saved_comment);
     }
-    //получить коммент по айди
+    /**
+     * Достает комментарий по айди из базы данных
+     * @param id Id задачи
+     * @return {@code CommentResponseDto} содержащую данные о комментарии
+     */
     public CommentResponseDto getCommentById(Long id) {
         Comment saved_comment = commentRepository.findById(id).orElseThrow(() -> new NullPointerException(
                 "Comment not found"
         ));
         return toDto(saved_comment);
     }
-    //получить все комменты с фильтром на автора и айди таски
+    /**
+     * Достает комментарии по заданой пагинации и фильтрам
+     * @param pageable Page параметры
+     * @param taskId Id задачи(фильтр)
+     * @param authorEmail Email автора(фильтр)
+     * @return {@code Page<CommentResponseDto>} содержащую данные о комментариях по фильтру и пагинации
+     */
     public Page<CommentResponseDto> getAllTasks(Pageable pageable, String authorEmail, Long taskId) {
         Specification<Comment> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -67,7 +82,11 @@ public class CommentService {
         Page<Comment> comments = commentRepository.findAll(spec, pageable);
         return comments.map(this::toDto);
     }
-    //Comment to CommentResponseDto
+    /**
+     * Превращает объект класса Comment в объект класса CommentResponseDto
+     * @param comment объект комментария(полностью заполненный)
+     * @return {@code CommentResponseDto} содержащую данные о комментарии
+     */
     public CommentResponseDto toDto(Comment comment){
         return new CommentResponseDto(
                 comment.getId(),
