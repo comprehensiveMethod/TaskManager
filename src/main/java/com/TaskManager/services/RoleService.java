@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 public class RoleService {
     private final RoleRepository roleRepository;
 
+    //при ините бина создание ролей админа и юзера если не существуют
     @PostConstruct
     public void initRoles() {
         createRoleIfNotFound("ADMIN");

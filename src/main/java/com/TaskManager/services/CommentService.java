@@ -25,6 +25,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final TaskService taskService;
+    //создаем коммент
     public CommentResponseDto createComment(CommentRequestDto commentRequestDto,String requester_email) {
         Task task = taskRepository.findById(commentRequestDto.getTaskId()).orElseThrow(() -> new NullPointerException(
                 "Task not found"
@@ -43,12 +44,14 @@ public class CommentService {
         Comment saved_comment = commentRepository.save(comment);
         return toDto(saved_comment);
     }
+    //получить коммент по айди
     public CommentResponseDto getCommentById(Long id) {
         Comment saved_comment = commentRepository.findById(id).orElseThrow(() -> new NullPointerException(
                 "Comment not found"
         ));
         return toDto(saved_comment);
     }
+    //получить все комменты с фильтром на автора и айди таски
     public Page<CommentResponseDto> getAllTasks(Pageable pageable, String authorEmail, Long taskId) {
         Specification<Comment> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -57,26 +60,14 @@ public class CommentService {
                 predicates.add(cb.equal(root.get("author"), user));
             }
             if (taskId != null) {
-                predicates.add(cb.equal(root.get("priority"), taskRepository.findById(taskId).get()));
+                predicates.add(cb.equal(root.get("taskId"), taskRepository.findById(taskId).get()));
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
         Page<Comment> comments = commentRepository.findAll(spec, pageable);
         return comments.map(this::toDto);
     }
-
-    public List<CommentResponseDto> getCommentsByTaskId(Long taskId) {
-        List<Comment> comments = commentRepository.findByTaskId(taskId);
-        List<CommentResponseDto> response = new ArrayList<>();
-        return comments.stream().map(this::toDto).toList();
-    }
-    public List<CommentResponseDto> getCommentsByAuthor(String email){
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new NullPointerException(
-                "Email not found"
-        ));
-        List<Comment> comments = commentRepository.findByAuthorId(user.getId());
-        return comments.stream().map(this::toDto).toList();
-    }
+    //Comment to CommentResponseDto
     public CommentResponseDto toDto(Comment comment){
         return new CommentResponseDto(
                 comment.getId(),

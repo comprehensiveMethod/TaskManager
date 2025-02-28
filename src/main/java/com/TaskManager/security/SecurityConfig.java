@@ -25,6 +25,7 @@ public class SecurityConfig {
     private final UserService userService;
     private final JwtRequestFilter jwtRequestFilter;
     private final PasswordEncoder passwordEncoder;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
@@ -33,6 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorizeHttpRequests) ->
                         authorizeHttpRequests
                                 .requestMatchers("/api").authenticated()
+                                //вообще /admin не существует здесь... но для масштабирумости добавил(по привычке)
                                 .requestMatchers("/admin").hasRole("ADMIN")
                                 .anyRequest().permitAll()
                 )
