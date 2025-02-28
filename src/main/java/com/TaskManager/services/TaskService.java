@@ -23,6 +23,7 @@ import java.util.List;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    //создаем таску
     public TaskResponseDto createTask(TaskRequestDto taskRequestDto, String requester_email) {
         Task task = new Task();
         task.setAssignee(userRepository.findByEmail(taskRequestDto.getAssigneeEmail()).orElseThrow(() -> new NullPointerException("Assignee not found")));
@@ -34,7 +35,7 @@ public class TaskService {
         Task savedTask = taskRepository.save(task);
         return toDto(savedTask);
     }
-
+    //админское обновление таски
     public TaskResponseDto updateTask(Long id, TaskAdminRequestDto taskDetails) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new NullPointerException("Task not found"));
         task.setTitle(taskDetails.getTitle());
@@ -46,6 +47,7 @@ public class TaskService {
         Task savedTask = taskRepository.save(task);
         return toDto(savedTask);
     }
+    //USER обновление таски(только статус и приоритет)
     public TaskResponseDto updateTask(Long id, TaskStatus taskStatus){
         Task task = taskRepository.findById(id).orElseThrow(() -> new NullPointerException("Task not found"));
         task.setStatus(taskStatus);
@@ -53,32 +55,33 @@ public class TaskService {
         return toDto(savedTask);
     }
 
-
+    //создаем таску
     public TaskResponseDto getTaskById(Long id){
         Task task = taskRepository.findById(id).orElseThrow(() -> new NullPointerException("Task not found"));
         return toDto(task);
     }
+    //создаем таску по автору
     public List<TaskResponseDto> getTasksByAuthor(String email){
         User user = userRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("User not found"));
         List<Task> tasks = taskRepository.findByAuthor(user);
         return tasks.stream().map(this::toDto).toList();
     }
-
+    //создаем таску по исполнителю
     public List<TaskResponseDto> getTasksByAssignee(String email){
         User user = userRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("User not found"));
         List<Task> tasks = taskRepository.findByAssignee(user);
 
         return tasks.stream().map(this::toDto).toList();
     }
-
+    //админское удаление таски
     public void deleteTask(Long id) {
         taskRepository.deleteById(id);
     }
-
+    //создаем проверка что мейл принадлежит исполнителю таск айди
     public boolean isTaskAssignee(Long taskId, String email) {
         return taskRepository.findById(taskId).get().getAssignee().getEmail().equals(email);
     }
-
+    //Task to TaskResponseDto
     private TaskResponseDto toDto(Task task) {
         return new TaskResponseDto(
                 task.getId(),
@@ -90,6 +93,7 @@ public class TaskService {
                 task.getAssignee().getEmail()
         );
     }
+    //Получить все таски с пагинацией и фильтрацией по статусу и приоритету
     public Page<TaskResponseDto> getAllTasks(Pageable pageable, String status, String priority) {
             Specification<Task> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();

@@ -25,6 +25,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
 
+    //создаем токен на 2 часа, возвращаем токен
     public ResponseEntity<?> createAuthToken(@RequestBody JwtRequest authRequest){
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
@@ -35,6 +36,8 @@ public class AuthService {
         String token = jwtUtil.generateToken(userDetails);
         return ResponseEntity.ok(new JwtResponse(token));
     }
+
+    //создаем пользователя с ролью USER, возвращаем что сохранили в бд(конечно же проверяем mail по regex)
     public ResponseEntity<?> createUser(@RequestBody RegistrationUserDto registrationUserDto){
         if(!emailPattern.matcher(registrationUserDto.getEmail()).matches()){
             return new ResponseEntity<>("Wrong email", HttpStatus.UNAUTHORIZED);

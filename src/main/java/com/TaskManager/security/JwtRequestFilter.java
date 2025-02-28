@@ -19,9 +19,10 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+//фильтр в SecurityFilterChain
 public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
-
+    //проверка токена
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");

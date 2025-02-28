@@ -24,9 +24,11 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    //найти по мейлу
     public Optional<User> findByUsername(String email){
         return userRepository.findByEmail(email);
     }
+    //UserDetails по мейлу
     @Transactional
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -39,6 +41,7 @@ public class UserService implements UserDetailsService {
                 user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList()
         );
     }
+    //создается пользователь с ролью USER
     public User createNewUser(RegistrationUserDto registrationUserDto){
         User user = new User();
         user.setEmail(registrationUserDto.getEmail());

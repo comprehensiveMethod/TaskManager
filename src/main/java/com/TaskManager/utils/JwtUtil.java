@@ -22,6 +22,8 @@ public class JwtUtil {
     //конечно надо хранить в application.properties ключ в ком. разработке, для наглядности поставил тут
     private static final String SECRET_KEY = "very_secret_key_which_should_be_very_long";
     SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+
+    //генерация токена, в клеймы кладем роли и мейл
     public String generateToken(UserDetails userDetails){
         Map<String,Object> claims = new HashMap<>();
         List<String> rolesList = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
