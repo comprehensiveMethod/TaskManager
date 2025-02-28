@@ -25,6 +25,7 @@ public class AuthController {
     @Operation(summary = "Авторизация пользователя", description = "Авторизирует пользователя и выдает JWT токен на 2 часа")
     @ApiResponse(responseCode = "200", description = "Пользователь авторизирован", content = @Content(schema = @Schema(implementation = JwtResponse.class)))
     @ApiResponse(responseCode = "401", description = "Ошибка авторизации",content = @Content())
+    @ApiResponse(responseCode = "400", description = "Неправильные данные",content = @Content())
     public ResponseEntity<?> createAuthToken(@io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Данные для авторизации пользователя",
             required = true,
@@ -37,6 +38,7 @@ public class AuthController {
     @Operation(summary = "Зарегистрировать пользователя", description = "Создает пользователя с указанной почтой и паролем")
     @ApiResponse(responseCode = "200", description = "Пользователь создан", content = @Content(schema = @Schema(implementation = RegistrationUserDto.class)))
     @ApiResponse(responseCode = "401", description = "Ошибка регистрации",content = @Content())
+    @ApiResponse(responseCode = "400", description = "Неправильные данные",content = @Content())
     public ResponseEntity<?> createUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Данные для регистрации пользователя",
             required = true,
