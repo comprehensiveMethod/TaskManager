@@ -5,6 +5,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -19,9 +21,15 @@ import java.util.Map;
 
 @Component
 public class JwtUtil {
-    //конечно надо хранить в application.properties ключ в ком. разработке, для наглядности поставил тут
-    private static final String SECRET_KEY = "very_secret_key_which_should_be_very_long";
-    SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+
+    @Value("${app.secret.key}")
+    private String SECRET_KEY;
+    private SecretKey key;
+
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+    }
 
     //генерация токена, в клеймы кладем роли и мейл
     public String generateToken(UserDetails userDetails){
