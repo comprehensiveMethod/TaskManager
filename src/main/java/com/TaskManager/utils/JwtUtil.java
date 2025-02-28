@@ -31,7 +31,15 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     }
 
-    //генерация токена, в клеймы кладем роли и мейл
+    /**
+     * Генерирует JWT на основе данных пользователя.
+     * В токен добавляются claims (утверждения) с ролями пользователя и его email.
+     *
+     * @param userDetails объект {@link UserDetails}, содержащий информацию о пользователе
+     * @return строка, представляющая JWT
+     * @see UserDetails
+     * @see GrantedAuthority
+     */
     public String generateToken(UserDetails userDetails){
         Map<String,Object> claims = new HashMap<>();
         List<String> rolesList = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
@@ -45,6 +53,12 @@ public class JwtUtil {
                 .signWith(key)
                 .compact();
     }
+    /**
+     * Извлекает имя пользователя (subject) из JWT.
+     *
+     * @param token JWT, из которого извлекается информация
+     * @return имя пользователя или {@code null}, если токен невалиден
+     */
     public String getUsername(String token){
         try {
             return getAllClaimsFromToken(token).getSubject();
@@ -53,6 +67,12 @@ public class JwtUtil {
         }
 
     }
+    /**
+     * Извлекает список ролей пользователя из JWT.
+     *
+     * @param token JWT, из которого извлекается информация
+     * @return список ролей или {@code null}, если токен невалиден
+     */
     public List<String> getRoles(String token){
         try {
             return getAllClaimsFromToken(token).get("roles", List.class);
@@ -60,7 +80,13 @@ public class JwtUtil {
             return null;
         }
     }
-
+    /**
+     * Извлекает все claims (утверждения) из JWT.
+     * Если подпись токена невалидна, метод возвращает {@code null} и выводит сообщение об ошибке.
+     * @param token JWT, из которого извлекаются claims
+     * @return объект {@link Claims}, содержащий все утверждения, или {@code null}, если токен невалиден
+     * @see Claims
+     */
     private Claims getAllClaimsFromToken(String token){
         try {
             return Jwts.parser()
