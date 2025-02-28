@@ -86,6 +86,7 @@ public class TaskController {
     @ApiResponse(responseCode = "200", description = "Задачи найдена")
     @ApiResponse(responseCode = "404", description = "Задачи не найдены",content = @Content())
     @ApiResponse(responseCode = "403", description = "Доступ запрещен" ,content = @Content())
+    @ApiResponse(responseCode = "400", description = "Неправильные данные",content = @Content())
     public ResponseEntity<TaskResponseDto> createTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Данные для создания задачи",
             required = true,
@@ -106,6 +107,7 @@ public class TaskController {
     @ApiResponse(responseCode = "200", description = "Задачи изменена")
     @ApiResponse(responseCode = "404", description = "Задача/автор/исполнитель не найдены",content = @Content())
     @ApiResponse(responseCode = "403", description = "Доступ запрещен" ,content = @Content())
+    @ApiResponse(responseCode = "400", description = "Неправильные данные",content = @Content())
     public ResponseEntity<TaskResponseDto> updateTask(@PathVariable Long id, @RequestBody TaskAdminRequestDto taskRequestDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ADMIN"))){
@@ -123,6 +125,7 @@ public class TaskController {
     @ApiResponse(responseCode = "200", description = "Задачи изменена")
     @ApiResponse(responseCode = "404", description = "Задача/автор/исполнитель не найдены",content = @Content())
     @ApiResponse(responseCode = "403", description = "Доступ запрещен" ,content = @Content())
+    @ApiResponse(responseCode = "400", description = "Неправильные данные",content = @Content())
     public ResponseEntity<TaskResponseDto> updateTask(@PathVariable Long id, @RequestBody TaskStatus taskStatus){
         try {
             return ResponseEntity.ok(taskService.updateTask(id, taskStatus));

@@ -28,6 +28,7 @@ public class CommentController {
     @ApiResponse(responseCode = "200", description = "Комментарий создан")
     @ApiResponse(responseCode = "404", description = "Задача не найдена",content = @Content())
     @ApiResponse(responseCode = "403", description = "Доступ запрещен" ,content = @Content())
+    @ApiResponse(responseCode = "400", description = "Неправильные данные",content = @Content())
     @PostMapping
     public ResponseEntity<CommentResponseDto> createComment(@RequestBody CommentRequestDto commentRequestDto){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -48,6 +49,7 @@ public class CommentController {
     @ApiResponse(responseCode = "200", description = "Комментарий создан")
     @ApiResponse(responseCode = "404", description = "Задача не найдена",content = @Content())
     @ApiResponse(responseCode = "403", description = "Доступ запрещен" ,content = @Content())
+    @ApiResponse(responseCode = "400", description = "Неправильные данные",content = @Content())
     @GetMapping("/{id}")
     public ResponseEntity<CommentResponseDto> getComment(@PathVariable Long id){
         try{
@@ -60,6 +62,7 @@ public class CommentController {
     @ApiResponse(responseCode = "200", description = "Комментарии получены")
     @ApiResponse(responseCode = "404", description = "Задача не найдена",content = @Content())
     @ApiResponse(responseCode = "403", description = "Доступ запрещен" ,content = @Content())
+    @ApiResponse(responseCode = "400", description = "Неправильные данные",content = @Content())
     @GetMapping
     public ResponseEntity<Page<CommentResponseDto>> getAllComments(@RequestParam(defaultValue = "0") int page,
                                                                    @RequestParam(defaultValue = "10") int size,
