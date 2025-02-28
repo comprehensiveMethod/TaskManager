@@ -11,13 +11,18 @@ import org.springframework.stereotype.Service;
 public class RoleService {
     private final RoleRepository roleRepository;
 
-    //при ините бина создание ролей админа и юзера если не существуют
+    /**
+     * Создает роли 'USER' и 'ADMIN' при инициализации
+     */
     @PostConstruct
     public void initRoles() {
         createRoleIfNotFound("ADMIN");
         createRoleIfNotFound("USER");
     }
-
+    /**
+     * Создает роль с именем, указанному в строке
+     * @param name название роли для сохранения
+     */
     private void createRoleIfNotFound(String name) {
         if (!roleRepository.findByName(name).isPresent()) {
             Role role = new Role();

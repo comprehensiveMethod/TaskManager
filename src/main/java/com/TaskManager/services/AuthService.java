@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.regex.Pattern;
 
+/**
+ * Класс AuthService предоставляет базовые функции по авторизации и регистрации пользователей.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -25,7 +28,11 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
 
-    //создаем токен на 2 часа, возвращаем токен
+    /**
+     * Создает токен для пользователя
+     * @param authRequest Dto содержащая почту и пароль пользователя
+     * @return {@code Response.ok(JwtResponse)} содержащий Jwt токен
+     */
     public ResponseEntity<?> createAuthToken(@RequestBody JwtRequest authRequest){
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
@@ -37,7 +44,12 @@ public class AuthService {
         return ResponseEntity.ok(new JwtResponse(token));
     }
 
-    //создаем пользователя с ролью USER, возвращаем что сохранили в бд(конечно же проверяем mail по regex)
+    /**
+     * Создает пользователя с ролью 'USER'
+     *
+     * @param registrationUserDto Dto содержащая почту, пароль и подтвержение пароля пользователя
+     * @return {@code Response.ok(User)} содержащий данные о зарегистрированном пользователе
+     */
     public ResponseEntity<?> createUser(@RequestBody RegistrationUserDto registrationUserDto){
         if(!emailPattern.matcher(registrationUserDto.getEmail()).matches()){
             return new ResponseEntity<>("Wrong email", HttpStatus.UNAUTHORIZED);

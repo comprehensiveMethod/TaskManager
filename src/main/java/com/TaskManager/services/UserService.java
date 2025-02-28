@@ -24,11 +24,20 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    //найти по мейлу
+
+    /**
+     * Загружает пользователя по Email
+     * @param email Email пользователя
+     * @return {@code User}, содержащий данные о пользователе
+     */
     public Optional<User> findByUsername(String email){
         return userRepository.findByEmail(email);
     }
-    //UserDetails по мейлу
+    /**
+     * Загружает пользователя по Email
+     * @param username Email пользователя
+     * @return {@code UserDetails}, содержащий данные о загруженном пользователе
+     */
     @Transactional
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -41,7 +50,11 @@ public class UserService implements UserDetailsService {
                 user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList()
         );
     }
-    //создается пользователь с ролью USER
+    /**
+     * Создает пользователя с ролью 'USER'
+     * @param registrationUserDto данные регистрации пользователя
+     * @return {@code User}, содержащий данные о сохраненном в базе данных пользователе
+     */
     public User createNewUser(RegistrationUserDto registrationUserDto){
         User user = new User();
         user.setEmail(registrationUserDto.getEmail());
