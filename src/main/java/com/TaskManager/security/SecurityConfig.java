@@ -15,22 +15,43 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity
 @Configuration
-public class SecurityConfig {
+public class SecurityConfig implements WebMvcConfigurer {
     private final UserService userService;
     private final JwtRequestFilter jwtRequestFilter;
     private final PasswordEncoder passwordEncoder;
+    /**
+     * Настройка конфигурации CORS
+     * @return {@code UrlBasedCorsConfigurationSource} конфигурация CORS
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        var corsConfig = new CorsConfiguration();
+        corsConfig.setAllowedOrigins(List.of("http://localhost:3000"));
+        corsConfig.setAllowCredentials(true);
+        corsConfig.setAllowedMethods(List.of("*"));
+        corsConfig.setAllowedHeaders(List.of("*"));
 
+        var urlBasedConfig = new UrlBasedCorsConfigurationSource();
+        urlBasedConfig.registerCorsConfiguration("/api/some-amazing-api/**", corsConfig);
+        return urlBasedConfig;
+    }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
+                .cors(cors->cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests((authorizeHttpRequests) ->
                         authorizeHttpRequests
                                 .requestMatchers("/api").authenticated()
@@ -46,6 +67,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
